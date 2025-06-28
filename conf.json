@@ -1,0 +1,9 @@
+{
+	"maxplayers" : 100,
+	"name" : "Dreamer", 
+	"gamemode" : "RP", 
+	"stream-distance" : 300.0,
+	"announce" : false,
+	"csharp" : "disabled",
+	"port": 22005
+}

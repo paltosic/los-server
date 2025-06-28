@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="package://accounts/cef/style.css" />
+  </head>
+  <body>
+    <div class="login-page">
+      <div class="form">
+        <div id="error"></div>
+        <form class="register-form" id="register">
+          <input id="reg-login" type="text" placeholder="Логін" />
+          <input id="reg-password" type="password" placeholder="Пароль" />
+          <input id="reg-password-confirm" type="password" placeholder="Повторити пароль"/>
+          <button type="button" onclick="registerAttempt()">Створити</button>
+          <p class="message">
+            Уже зареєстровані? <a href="#" onclick="showLogin()">Увійти</a>
+          </p>
+        </form>
+        <form class="login-form" id="login">
+          <input id="log-login" type="text" placeholder="Логін" />
+          <input id="log-password" type="password" placeholder="Пароль" />
+          <button type="button" onclick="loginAttempt()">Увійти</button>
+          <p class="message">
+            Не маєш акаунту?
+            <a href="#" onclick="showRegister()">cтворити акаунт тут</a>
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <script src="package://accounts/cef/script.js"></script>
+  </body>
+</html>
