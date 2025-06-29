@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Character Creation</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            font-family: Arial, sans-serif; 
+            background: rgba(0,0,0,0.8); 
+            color: white;
+        }
+        .container { 
+            max-width: 400px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            background: rgba(0,0,0,0.9); 
+            border-radius: 10px;
+        }
+        select, input { 
+            width: 100%; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border: 1px solid #333; 
+            background: #222; 
+            color: white;
+        }
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create Your Character</h2>
+        
+        <label>Gender:</label>
+        <select id="gender">
+            <option value="0">Male</option>
+            <option value="1">Female</option>
+        </select>
+        
+        <label>Hair Style:</label>
+        <input type="range" id="hair" min="0" max="36" value="1">
+        
+        <label>Hair Color:</label>
+        <input type="range" id="hairColor1" min="0" max="63" value="0">
+        
+        <button onclick="submitCharacter()">Create Character</button>
+    </div>
+
+    <script>
+        function submitCharacter() {
+            const characterData = {
+                gender: parseInt(document.getElementById('gender').value),
+                hair: parseInt(document.getElementById('hair').value),
+                hairColor1: parseInt(document.getElementById('hairColor1').value),
+                hairColor2: 0,
+                mother: 21,
+                father: 0,
+                resemblance: 0.5,
+                skinTone: 0.5,
+                eyes: 0
+            };
+            
+            mp.trigger('saveCharacter', JSON.stringify(characterData));
+        }
+    </script>
+</body>
+</html>

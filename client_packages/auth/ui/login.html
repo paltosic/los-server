@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Login</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            font-family: Arial, sans-serif; 
+            background: rgba(0,0,0,0.8); 
+            color: white;
+        }
+        .container { 
+            max-width: 400px; 
+            margin: 100px auto; 
+            padding: 20px; 
+            background: rgba(0,0,0,0.9); 
+            border-radius: 10px;
+        }
+        input { 
+            width: 100%; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border: 1px solid #333; 
+            background: #222; 
+            color: white;
+        }
+        button { 
+            width: 100%; 
+            padding: 10px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            cursor: pointer;
+        }
+        .error { color: red; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <div id="error" class="error"></div>
+        <input type="text" id="login" placeholder="Login">
+        <input type="password" id="password" placeholder="Password">
+        <input type="email" id="email" placeholder="Email (for registration)">
+        <button onclick="submitLogin()">Login</button>
+        <button onclick="submitRegister()">Register</button>
+    </div>
+
+    <script>
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+        }
+        
+        function submitLogin() {
+            const login = document.getElementById('login').value;
+            const password = document.getElementById('password').value;
+            
+            if (!login || !password) {
+                showError('Please fill all fields');
+                return;
+            }
+            
+            mp.trigger('onLoginAttempt', JSON.stringify({ login, password }));
+        }
+        
+        function submitRegister() {
+            const login = document.getElementById('login').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            
+            if (!login || !password) {
+                showError('Please fill all fields');
+                return;
+            }
+            
+            mp.trigger('onRegisterAttempt', JSON.stringify({ login, password, email }));
+        }
+    </script>
+</body>
+</html>
