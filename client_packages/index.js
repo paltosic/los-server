@@ -1,4 +1,6 @@
-require('accounts');
+// require('accounts');
+// require('auth');
+require('auth/auth.js');
 require('freeroam');
 require('trucker');
 require('noclip');
@@ -7,7 +9,6 @@ require('noclip');
 // require('./client/systems/fact/ions');
 require('taxi');
 
-require('nativeui');
 // require("./client/core"); 
 
 
