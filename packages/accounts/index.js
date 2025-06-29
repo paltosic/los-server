@@ -1,7 +1,8 @@
-const mysql = require('mysql');
 const { Account } = require('../orm/models');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+
+console.log('[SERVER AUTH] Loading authentication system...');
 
 // Rate limiting
 const loginAttempts = new Map();
@@ -36,37 +37,49 @@ function clearFailedAttempts(ip) {
 }
 
 mp.events.add('playerReady', (player) => {
+  console.log(`[SERVER AUTH] Player ${player.name} (${player.ip}) connected`);
+  
   player.vars = {};
   player.loggedIn = false;
   player.dimension = (1000 + player.id);
   
-  console.log(`[AUTH] ${player.name} connected from ${player.ip}`);
-  player.call('showLoginDialog');
+  // Small delay to ensure client is ready
+  setTimeout(() => {
+    player.call('showLoginDialog');
+    console.log(`[SERVER AUTH] Sent login dialog to ${player.name}`);
+  }, 2000);
 });
 
 mp.events.add('onLoginAttempt', async (player, data) => {
+  console.log(`[SERVER AUTH] Login attempt from ${player.name}: ${data}`);
+  
   try {
     const rateLimitCheck = checkRateLimit(player.ip);
     if (!rateLimitCheck.allowed) {
+      console.log(`[SERVER AUTH] Rate limited: ${player.name}`);
       return player.call('showAuthError', [
         `Too many failed attempts. Wait ${rateLimitCheck.timeLeft} minutes.`
       ]);
     }
 
     const { login, password } = JSON.parse(data);
+    console.log(`[SERVER AUTH] Attempting login for: ${login}`);
 
     const account = await Account.findOne({ where: { login } });
     if (!account) {
+      console.log(`[SERVER AUTH] Account not found: ${login}`);
       recordFailedAttempt(player.ip);
       return player.call('showAuthError', ['Invalid login or password']);
     }
 
     const isPasswordMatch = await bcrypt.compare(password, account.password);
     if (!isPasswordMatch) {
+      console.log(`[SERVER AUTH] Invalid password for: ${login}`);
       recordFailedAttempt(player.ip);
       return player.call('showAuthError', ['Invalid login or password']);
     }
 
+    console.log(`[SERVER AUTH] Login successful: ${login}`);
     clearFailedAttempts(player.ip);
 
     await account.update({
@@ -74,7 +87,7 @@ mp.events.add('onLoginAttempt', async (player, data) => {
       socialClub: player.socialClub,
       lastConnected: new Date(),
       online: true,
-      totalConnections: account.totalConnections + 1
+      totalConnections: (account.totalConnections || 0) + 1
     });
 
     player.account = account;
@@ -85,14 +98,17 @@ mp.events.add('onLoginAttempt', async (player, data) => {
     }, 1000);
 
   } catch (error) {
-    console.error('Login error:', error);
-    player.call('showAuthError', ['Login failed']);
+    console.error('[SERVER AUTH] Login error:', error);
+    player.call('showAuthError', ['Login failed - server error']);
   }
 });
 
 mp.events.add('onRegisterAttempt', async (player, data) => {
+  console.log(`[SERVER AUTH] Register attempt from ${player.name}: ${data}`);
+  
   try {
     const { login, password, email } = JSON.parse(data);
+    console.log(`[SERVER AUTH] Attempting registration for: ${login}`);
 
     // Validation
     if (!password || password.length < 6) {
@@ -110,6 +126,7 @@ mp.events.add('onRegisterAttempt', async (player, data) => {
 
     const existingAccount = await Account.findOne({ where: { login } });
     if (existingAccount) {
+      console.log(`[SERVER AUTH] Account already exists: ${login}`);
       return player.call('showAuthError', ['Account already exists']);
     }
 
@@ -122,6 +139,15 @@ mp.events.add('onRegisterAttempt', async (player, data) => {
       ip: player.ip,
       socialClub: player.socialClub,
       serial: player.serial || 'unknown',
+      
+      // Initial values
+      level: 1,
+      wallet: 1000,
+      bank: 75000,
+      respect: 0,
+      hoursPlayed: 0,
+      admin: 0,
+      warns: 0,
       
       inventory: JSON.stringify([
         {
@@ -150,15 +176,18 @@ mp.events.add('onRegisterAttempt', async (player, data) => {
       justRegistered: true
     });
 
+    console.log(`[SERVER AUTH] Registration successful: ${login}`);
+    
     player.account = newAccount;
     player.call('hideLoginDialog');
     
-    console.log(`[AUTH] New account registered: ${login}`);
-    player.call('prepareCharacter');
+    setTimeout(() => {
+      player.call('prepareCharacter');
+    }, 1000);
 
   } catch (error) {
-    console.error('Registration error:', error);
-    player.call('showAuthError', ['Registration failed']);
+    console.error('[SERVER AUTH] Registration error:', error);
+    player.call('showAuthError', ['Registration failed - server error']);
   }
 });
 
@@ -166,4 +195,28 @@ mp.events.add('onRegisterAttempt', async (player, data) => {
 require('./character');
 require('./spawn');
 
-console.log('[AUTH] Account system loaded');
+console.log('[SERVER AUTH] Authentication system loaded');
+
+
+// Debug commands for character system
+mp.events.addCommand('testchar', (player) => {
+    if (!player.checkAdminRank || !player.checkAdminRank(1)) {
+        console.log(`[DEBUG] Testing character for ${player.name}`);
+        player.call('prepareCharacter');
+    }
+});
+
+mp.events.addCommand('reloadchar', (player) => {
+    if (player.info && player.info.character) {
+        mp.events.call("loadClothes", player);
+        player.pushChat('Character appearance reloaded.');
+    }
+});
+
+// Helper function for admin rank checking
+mp.events.add("loadVariables", (player) => {
+    // Add this to existing loadVariables
+    player.checkAdminRank = function(level) {
+        return (player.info && player.info.admin >= level);
+    };
+});

@@ -3,80 +3,165 @@
 <head>
     <meta charset="utf-8">
     <title>Login</title>
-    <style>
-        body { 
-            margin: 0; 
-            padding: 20px; 
-            font-family: Arial, sans-serif; 
-            background: rgba(0,0,0,0.8); 
-            color: white;
-        }
-        .container { 
-            max-width: 400px; 
-            margin: 100px auto; 
-            padding: 20px; 
-            background: rgba(0,0,0,0.9); 
-            border-radius: 10px;
-        }
-        input { 
-            width: 100%; 
-            padding: 10px; 
-            margin: 10px 0; 
-            border: 1px solid #333; 
-            background: #222; 
-            color: white;
-        }
-        button { 
-            width: 100%; 
-            padding: 10px; 
-            background: #007bff; 
-            color: white; 
-            border: none; 
-            cursor: pointer;
-        }
-        .error { color: red; margin: 10px 0; }
-    </style>
+    <link rel="stylesheet" href="login_style.css">
+
 </head>
 <body>
     <div class="container">
-        <h2>Login</h2>
+        <h2>Welcome to the Server</h2>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('login')">Login</button>
+            <button class="tab" onclick="showTab('register')">Register</button>
+        </div>
+        
         <div id="error" class="error"></div>
-        <input type="text" id="login" placeholder="Login">
-        <input type="password" id="password" placeholder="Password">
-        <input type="email" id="email" placeholder="Email (for registration)">
-        <button onclick="submitLogin()">Login</button>
-        <button onclick="submitRegister()">Register</button>
+        
+        <!-- Login Tab -->
+        <div id="login-tab" class="tab-content active">
+            <input type="text" id="login-username" placeholder="Username">
+            <input type="password" id="login-password" placeholder="Password">
+            <button onclick="submitLogin()">Login</button>
+        </div>
+        
+        <!-- Register Tab -->
+        <div id="register-tab" class="tab-content">
+            <input type="text" id="register-username" placeholder="Username">
+            <input type="password" id="register-password" placeholder="Password">
+            <input type="email" id="register-email" placeholder="Email (optional)">
+            <button class="register-btn" onclick="submitRegister()">Register</button>
+        </div>
     </div>
 
     <script>
+        console.log('[BROWSER] Login page loaded');
+        
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Clear error
+            hideError();
+        }
+        
         function showError(message) {
-            document.getElementById('error').textContent = message;
+            console.log('[BROWSER] Showing error:', message);
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
         }
         
         function submitLogin() {
-            const login = document.getElementById('login').value;
-            const password = document.getElementById('password').value;
+            console.log('[BROWSER] Submit login clicked');
+            hideError();
             
-            if (!login || !password) {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
                 showError('Please fill all fields');
                 return;
             }
             
-            mp.trigger('onLoginAttempt', JSON.stringify({ login, password }));
+            if (username.length < 3) {
+                showError('Username must be at least 3 characters');
+                return;
+            }
+            
+            // if (password.length < 6) {
+            //     showError('Password must be at least 6 characters');
+            //     return;
+            // }
+            
+            const data = JSON.stringify({ 
+                login: username, 
+                password: password 
+            });
+            
+            console.log('[BROWSER] Sending login data:', data);
+            
+            // Send to client
+            if (typeof mp !== 'undefined' && mp.trigger) {
+                mp.trigger('browserLoginAttempt', data);
+            } else {
+                console.error('[BROWSER] mp object not available');
+                showError('Connection error - please restart game');
+            }
         }
         
         function submitRegister() {
-            const login = document.getElementById('login').value;
-            const password = document.getElementById('password').value;
-            const email = document.getElementById('email').value;
+            console.log('[BROWSER] Submit register clicked');
+            hideError();
             
-            if (!login || !password) {
-                showError('Please fill all fields');
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value;
+            const email = document.getElementById('register-email').value.trim();
+            
+            if (!username || !password) {
+                showError('Please fill all required fields');
                 return;
             }
             
-            mp.trigger('onRegisterAttempt', JSON.stringify({ login, password, email }));
+            if (username.length < 3 || username.length > 20) {
+                showError('Username must be 3-20 characters');
+                return;
+            }
+            
+            // if (password.length < 6) {
+            //     showError('Password must be at least 6 characters');
+            //     return;
+            // }
+            
+            // Check for forbidden words
+            const forbidden = ['admin', 'moderator', 'staff', 'owner', 'developer'];
+            if (forbidden.some(word => username.toLowerCase().includes(word))) {
+                showError('This username contains forbidden words');
+                return;
+            }
+            
+            const data = JSON.stringify({ 
+                login: username, 
+                password: password,
+                email: email || null
+            });
+            
+            console.log('[BROWSER] Sending register data:', data);
+            
+            // Send to client
+            if (typeof mp !== 'undefined' && mp.trigger) {
+                mp.trigger('browserRegisterAttempt', data);
+            } else {
+                console.error('[BROWSER] mp object not available');
+                showError('Connection error - please restart game');
+            }
         }
+        
+        // Handle Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab.id === 'login-tab') {
+                    submitLogin();
+                } else {
+                    submitRegister();
+                }
+            }
+        });
+        
+        console.log('[BROWSER] Login page scripts loaded');
     </script>
 </body>
 </html>

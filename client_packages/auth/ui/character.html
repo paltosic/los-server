@@ -1,77 +1,903 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>Character Creation</title>
-    <style>
-        body { 
-            margin: 0; 
-            padding: 20px; 
-            font-family: Arial, sans-serif; 
-            background: rgba(0,0,0,0.8); 
-            color: white;
-        }
-        .container { 
-            max-width: 400px; 
-            margin: 50px auto; 
-            padding: 20px; 
-            background: rgba(0,0,0,0.9); 
-            border-radius: 10px;
-        }
-        select, input { 
-            width: 100%; 
-            padding: 10px; 
-            margin: 10px 0; 
-            border: 1px solid #333; 
-            background: #222; 
-            color: white;
-        }
-        button { 
-            width: 100%; 
-            padding: 15px; 
-            background: #28a745; 
-            color: white; 
-            border: none; 
-            cursor: pointer;
-            font-size: 16px;
-        }
-    </style>
-</head>
-<body>
+    <link rel="stylesheet" href="character_style.css">
+  
+  </head>
+  <body>
     <div class="container">
-        <h2>Create Your Character</h2>
+      <div class="layout-container">
+        <div class="left-side">
+          <!-- Basic Tab -->
+          <div id="basic-tab" class="tab-content active">
+            <div class="section">
+              <h3>Gender Selection</h3>
+              <div class="gender-options">
+                <div class="gender-option selected" onclick="selectGender(0)">
+                  <strong>Male</strong>
+                  <span>Classic male character</span>
+                </div>
+                <div class="gender-option" onclick="selectGender(1)">
+                  <strong>Female</strong>
+                  <span>Classic female character</span>
+                </div>
+              </div>
+            </div>
+            <div class="section">
+              <h3>Genetics</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Father:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="father"
+                      min="0"
+                      max="45"
+                      value="0"
+                      oninput="updateValue('father', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="father-value">0</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Mother:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="mother"
+                      min="0"
+                      max="45"
+                      value="21"
+                      oninput="updateValue('mother', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="mother-value">21</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Resemblance (Father ← → Mother):</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="resemblance"
+                      min="0"
+                      max="100"
+                      value="50"
+                      oninput="updateValue('resemblance', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="resemblance-value">50</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Skin Tone:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="skinTone"
+                      min="0"
+                      max="100"
+                      value="50"
+                      oninput="updateValue('skinTone', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="skinTone-value">50</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Appearance Tab -->
+          <div id="appearance-tab" class="tab-content">
+            <div class="section">
+              <h3>Hair</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Hair Style:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="hair"
+                      min="0"
+                      max="36"
+                      value="1"
+                      oninput="updateValue('hair', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="hair-value">1</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Hair Color:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="hairColor1"
+                      min="0"
+                      max="63"
+                      value="0"
+                      oninput="updateValue('hairColor1', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="hairColor1-value">0</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Hair Highlight:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="hairColor2"
+                      min="0"
+                      max="63"
+                      value="0"
+                      oninput="updateValue('hairColor2', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="hairColor2-value">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="section">
+              <h3>Facial Features</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Eye Color:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="eyes"
+                      min="0"
+                      max="31"
+                      value="0"
+                      oninput="updateValue('eyes', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="eyes-value">0</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Eyebrows:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="eyebrows"
+                      min="0"
+                      max="33"
+                      value="0"
+                      oninput="updateValue('eyebrows', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="eyebrows-value">0</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Facial Hair:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="facial"
+                      min="0"
+                      max="28"
+                      value="0"
+                      oninput="updateValue('facial', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="facial-value">0</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Facial Hair Color:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="facialColor"
+                      min="0"
+                      max="63"
+                      value="0"
+                      oninput="updateValue('facialColor', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="facialColor-value">0</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Ageing:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="ageing"
+                      min="0"
+                      max="14"
+                      value="0"
+                      oninput="updateValue('ageing', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="ageing-value">0</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Makeup:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="makeup"
+                      min="0"
+                      max="74"
+                      value="0"
+                      oninput="updateValue('makeup', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="makeup-value">0</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Lipstick:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="lipstick"
+                      min="0"
+                      max="9"
+                      value="0"
+                      oninput="updateValue('lipstick', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="lipstick-value">0</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Lipstick Color:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="lipstickColor"
+                      min="0"
+                      max="63"
+                      value="0"
+                      oninput="updateValue('lipstickColor', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="lipstickColor-value">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clothing Tab -->
+          <div id="clothing-tab" class="tab-content">
+            <div class="section">
+              <h3>Clothing</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Top:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="top"
+                      min="0"
+                      max="200"
+                      value="0"
+                      oninput="updateValue('top', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="top-value">0</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Undershirt:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="undershirt"
+                      min="0"
+                      max="100"
+                      value="0"
+                      oninput="updateValue('undershirt', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="undershirt-value">0</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Pants:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="pants"
+                      min="0"
+                      max="150"
+                      value="0"
+                      oninput="updateValue('pants', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="pants-value">0</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Shoes:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="shoes"
+                      min="0"
+                      max="100"
+                      value="0"
+                      oninput="updateValue('shoes', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="shoes-value">0</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Torso:</label>
+                  <div class="range-container">
+                    <input
+                      type="range"
+                      id="torso"
+                      min="0"
+                      max="200"
+                      value="0"
+                      oninput="updateValue('torso', this.value); updatePreview();"
+                    />
+                    <div class="range-value" id="torso-value">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview Tab -->
+          <div id="preview-tab" class="tab-content">
+            <div class="preview-section">
+              <h3>Character Preview</h3>
+              <div class="info-box">
+                <strong>Character Summary:</strong><br />
+                Gender: <span id="preview-gender">Male</span><br />
+                Hair Style: <span id="preview-hair">1</span><br />
+                Hair Color: <span id="preview-haircolor">0</span><br />
+                Eye Color: <span id="preview-eyes">0</span>
+              </div>
+
+              <p>
+                Use the camera controls to rotate around your character and see how
+                they look from different angles.
+              </p>
+
+              <div class="action-buttons">
+                <button class="btn-secondary" onclick="randomizeCharacter()">
+                  Randomize
+                </button>
+                <button class="btn-primary" onclick="showTab('basic')">
+                  Edit More
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="right-side">
+          <div class="header">
+            <h1>Character Creation</h1>
+            <p>Design your unique character and start your adventure</p>
+          </div>
+
+          <div class="tabs">
+            <button class="tab active" onclick="showTab('basic')">Basic</button>
+            <button class="tab" onclick="showTab('appearance')">Appearance</button>
+            <button class="tab" onclick="showTab('clothing')">Clothing</button>
+            <button class="tab" onclick="showTab('preview')">Preview</button>
+          </div>
+          <!-- Camera Controls -->
+          <div class="camera-controls">
+            <div class="camera-info">
+              <h3>Camera Controls</h3>
+              <p>
+                Use A/D keys or buttons below to rotate the camera around your
+                character
+              </p>
+                 <p>
+                Use W/S keys or buttons below to zoom the camera in/out
+              </p>
+            </div>
+            <div class="camera-buttons">
+              <button class="btn-camera" onclick="rotateCamera(-1)">
+                ← Rotate Left
+              </button>
+              <button class="btn-camera" onclick="rotateCamera(1)">
+                Rotate Right →
+              </button>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn-secondary" onclick="goBack()">Back to Login</button>
+            <button class="btn-success" onclick="submitCharacter()">
+              Create Character
+            </button>
+          </div>
+        </div>
         
-        <label>Gender:</label>
-        <select id="gender">
-            <option value="0">Male</option>
-            <option value="1">Female</option>
-        </select>
+      </div>
+
         
-        <label>Hair Style:</label>
-        <input type="range" id="hair" min="0" max="36" value="1">
-        
-        <label>Hair Color:</label>
-        <input type="range" id="hairColor1" min="0" max="63" value="0">
-        
-        <button onclick="submitCharacter()">Create Character</button>
+      </div>
+
+      <!-- Appearance Tab -->
+      <div id="appearance-tab" class="tab-content">
+        <div class="section">
+          <h3>Hair</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Hair Style:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="hair"
+                  min="0"
+                  max="36"
+                  value="1"
+                  oninput="updateValue('hair', this.value); updatePreview();"
+                />
+                <div class="range-value" id="hair-value">1</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Hair Color:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="hairColor1"
+                  min="0"
+                  max="63"
+                  value="0"
+                  oninput="updateValue('hairColor1', this.value); updatePreview();"
+                />
+                <div class="range-value" id="hairColor1-value">0</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Hair Highlight:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="hairColor2"
+                  min="0"
+                  max="63"
+                  value="0"
+                  oninput="updateValue('hairColor2', this.value); updatePreview();"
+                />
+                <div class="range-value" id="hairColor2-value">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Facial Features</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Eye Color:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="eyes"
+                  min="0"
+                  max="31"
+                  value="0"
+                  oninput="updateValue('eyes', this.value); updatePreview();"
+                />
+                <div class="range-value" id="eyes-value">0</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Eyebrows:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="eyebrows"
+                  min="0"
+                  max="33"
+                  value="0"
+                  oninput="updateValue('eyebrows', this.value); updatePreview();"
+                />
+                <div class="range-value" id="eyebrows-value">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Facial Hair:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="facial"
+                  min="0"
+                  max="28"
+                  value="0"
+                  oninput="updateValue('facial', this.value); updatePreview();"
+                />
+                <div class="range-value" id="facial-value">0</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Facial Hair Color:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="facialColor"
+                  min="0"
+                  max="63"
+                  value="0"
+                  oninput="updateValue('facialColor', this.value); updatePreview();"
+                />
+                <div class="range-value" id="facialColor-value">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ageing:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="ageing"
+                  min="0"
+                  max="14"
+                  value="0"
+                  oninput="updateValue('ageing', this.value); updatePreview();"
+                />
+                <div class="range-value" id="ageing-value">0</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Makeup:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="makeup"
+                  min="0"
+                  max="74"
+                  value="0"
+                  oninput="updateValue('makeup', this.value); updatePreview();"
+                />
+                <div class="range-value" id="makeup-value">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Lipstick:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="lipstick"
+                  min="0"
+                  max="9"
+                  value="0"
+                  oninput="updateValue('lipstick', this.value); updatePreview();"
+                />
+                <div class="range-value" id="lipstick-value">0</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Lipstick Color:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="lipstickColor"
+                  min="0"
+                  max="63"
+                  value="0"
+                  oninput="updateValue('lipstickColor', this.value); updatePreview();"
+                />
+                <div class="range-value" id="lipstickColor-value">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clothing Tab -->
+      <div id="clothing-tab" class="tab-content">
+        <div class="section">
+          <h3>Clothing</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Top:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="top"
+                  min="0"
+                  max="200"
+                  value="0"
+                  oninput="updateValue('top', this.value); updatePreview();"
+                />
+                <div class="range-value" id="top-value">0</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Undershirt:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="undershirt"
+                  min="0"
+                  max="100"
+                  value="0"
+                  oninput="updateValue('undershirt', this.value); updatePreview();"
+                />
+                <div class="range-value" id="undershirt-value">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pants:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="pants"
+                  min="0"
+                  max="150"
+                  value="0"
+                  oninput="updateValue('pants', this.value); updatePreview();"
+                />
+                <div class="range-value" id="pants-value">0</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Shoes:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="shoes"
+                  min="0"
+                  max="100"
+                  value="0"
+                  oninput="updateValue('shoes', this.value); updatePreview();"
+                />
+                <div class="range-value" id="shoes-value">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Torso:</label>
+              <div class="range-container">
+                <input
+                  type="range"
+                  id="torso"
+                  min="0"
+                  max="200"
+                  value="0"
+                  oninput="updateValue('torso', this.value); updatePreview();"
+                />
+                <div class="range-value" id="torso-value">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Tab -->
+      <div id="preview-tab" class="tab-content">
+        <div class="preview-section">
+          <h3>Character Preview</h3>
+          <div class="info-box">
+            <strong>Character Summary:</strong><br />
+            Gender: <span id="preview-gender">Male</span><br />
+            Hair Style: <span id="preview-hair">1</span><br />
+            Hair Color: <span id="preview-haircolor">0</span><br />
+            Eye Color: <span id="preview-eyes">0</span>
+          </div>
+
+          <p>
+            Use the camera controls to rotate around your character and see how
+            they look from different angles.
+          </p>
+
+          <div class="action-buttons">
+            <button class="btn-secondary" onclick="randomizeCharacter()">
+              Randomize
+            </button>
+            <button class="btn-primary" onclick="showTab('basic')">
+              Edit More
+            </button>
+          </div>
+        </div>
+      </div>
+
+      
     </div>
 
     <script>
-        function submitCharacter() {
-            const characterData = {
-                gender: parseInt(document.getElementById('gender').value),
-                hair: parseInt(document.getElementById('hair').value),
-                hairColor1: parseInt(document.getElementById('hairColor1').value),
-                hairColor2: 0,
-                mother: 21,
-                father: 0,
-                resemblance: 0.5,
-                skinTone: 0.5,
-                eyes: 0
-            };
-            
-            mp.trigger('saveCharacter', JSON.stringify(characterData));
+      console.log("[BROWSER] Enhanced character creation page loaded");
+
+      let selectedGender = 0;
+      let characterData = {
+        gender: 0,
+        father: 0,
+        mother: 21,
+        resemblance: 0.5,
+        skinTone: 0.5,
+        hair: 1,
+        hairColor1: 0,
+        hairColor2: 0,
+        eyes: 0,
+        eyebrows: 0,
+        facial: 0,
+        facialColor: 0,
+        ageing: 0,
+        makeup: 0,
+        lipstick: 0,
+        lipstickColor: 0,
+        top: 0,
+        undershirt: 0,
+        pants: 0,
+        shoes: 0,
+        torso: 0,
+      };
+
+      function showTab(tabName) {
+        console.log("[BROWSER] Switching to tab:", tabName);
+
+        // Hide all tabs
+        document.querySelectorAll(".tab-content").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        // Show selected tab
+        document.getElementById(tabName + "-tab").classList.add("active");
+
+        // Update active tab button
+        const tabs = document.querySelectorAll(".tab");
+        const tabNames = ["basic", "appearance", "clothing", "preview"];
+        const tabIndex = tabNames.indexOf(tabName);
+        if (tabIndex >= 0 && tabs[tabIndex]) {
+          tabs[tabIndex].classList.add("active");
         }
+
+        if (tabName === "preview") {
+          updatePreviewInfo();
+        }
+      }
+
+      function selectGender(gender) {
+        console.log("[BROWSER] Gender selected:", gender);
+        selectedGender = gender;
+        characterData.gender = gender;
+
+        // Update UI
+        document.querySelectorAll(".gender-option").forEach((option) => {
+          option.classList.remove("selected");
+        });
+
+        event.target.classList.add("selected");
+        updatePreview();
+      }
+
+      function updateValue(id, value) {
+        document.getElementById(id + "-value").textContent = value;
+
+        // Update character data
+        if (id === "resemblance" || id === "skinTone") {
+          characterData[id] = parseFloat(value) / 100;
+        } else {
+          characterData[id] = parseInt(value);
+        }
+      }
+
+      function updatePreview() {
+        // Send preview update to client
+        if (typeof mp !== "undefined" && mp.trigger) {
+          mp.trigger("browserUpdateCharacter", JSON.stringify(characterData));
+        }
+      }
+
+      function updatePreviewInfo() {
+        document.getElementById("preview-gender").textContent =
+          selectedGender === 0 ? "Male" : "Female";
+        document.getElementById("preview-hair").textContent =
+          characterData.hair;
+        document.getElementById("preview-haircolor").textContent =
+          characterData.hairColor1;
+        document.getElementById("preview-eyes").textContent =
+          characterData.eyes;
+      }
+
+      function randomizeCharacter() {
+        console.log("[BROWSER] Randomizing character");
+
+        // Randomize basic features
+        characterData.father = Math.floor(Math.random() * 46);
+        characterData.mother = Math.floor(Math.random() * 46);
+        characterData.resemblance = Math.random();
+        characterData.skinTone = Math.random();
+        characterData.hair = Math.floor(Math.random() * 37);
+        characterData.hairColor1 = Math.floor(Math.random() * 64);
+        characterData.hairColor2 = Math.floor(Math.random() * 64);
+        characterData.eyes = Math.floor(Math.random() * 32);
+        characterData.eyebrows = Math.floor(Math.random() * 34);
+
+        // Update UI values
+        document.getElementById("father").value = characterData.father;
+        document.getElementById("mother").value = characterData.mother;
+        document.getElementById("resemblance").value =
+          characterData.resemblance * 100;
+        document.getElementById("skinTone").value =
+          characterData.skinTone * 100;
+        document.getElementById("hair").value = characterData.hair;
+        document.getElementById("hairColor1").value = characterData.hairColor1;
+        document.getElementById("hairColor2").value = characterData.hairColor2;
+        document.getElementById("eyes").value = characterData.eyes;
+        document.getElementById("eyebrows").value = characterData.eyebrows;
+
+        // Update display values
+        updateValue("father", characterData.father);
+        updateValue("mother", characterData.mother);
+        updateValue("resemblance", characterData.resemblance * 100);
+        updateValue("skinTone", characterData.skinTone * 100);
+        updateValue("hair", characterData.hair);
+        updateValue("hairColor1", characterData.hairColor1);
+        updateValue("hairColor2", characterData.hairColor2);
+        updateValue("eyes", characterData.eyes);
+        updateValue("eyebrows", characterData.eyebrows);
+
+        updatePreview();
+      }
+
+      function goBack() {
+        if (typeof mp !== "undefined" && mp.trigger) {
+          // This would trigger going back to login
+          console.log("[BROWSER] Going back to login");
+          // You can implement this functionality
+        }
+      }
+
+      function submitCharacter() {
+        console.log("[BROWSER] Submit character clicked");
+
+        // Ensure gender is set correctly
+        characterData.gender = selectedGender;
+
+        const data = JSON.stringify(characterData);
+        console.log("[BROWSER] Sending character data:", data);
+
+        // Send to client
+        if (typeof mp !== "undefined" && mp.trigger) {
+          mp.trigger("browserSaveCharacter", data);
+        } else {
+          console.error("[BROWSER] mp object not available");
+          alert("Connection error - please restart game");
+        }
+      }
+
+      // Initialize default values
+      window.addEventListener("load", function () {
+        console.log("[BROWSER] Initializing character creation");
+        updatePreview();
+      });
+
+      console.log("[BROWSER] Enhanced character creation scripts loaded");
+      
+      function rotateCamera(direction) {
+    console.log('[BROWSER] Rotating camera:', direction);
+    
+    if (typeof mp !== 'undefined' && mp.trigger) {
+        mp.trigger('browserRotateCamera', direction);
+    }
+}
     </script>
-</body>
+  </body>
 </html>

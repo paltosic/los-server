@@ -31,3 +31,15 @@ mp.events.add('guiReady', () => {
         });
     }
 });
+
+
+const player = mp.players.local;
+
+mp.events.add('render', () => {
+    mp.game.graphics.drawText(`X: ${player.position.x.toFixed(2)}, Y: ${player.position.y.toFixed(2)}, Z: ${player.position.z.toFixed(2)}`, [0.5, 0.010], {
+        font: 4,
+        color: [255, 255, 255, 255],
+        scale: [0.4, 0.4],
+        outline: true
+    });
+});
