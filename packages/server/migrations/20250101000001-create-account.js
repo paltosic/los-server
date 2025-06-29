@@ -249,6 +249,11 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
+      },
+      justRegistered : {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+        allowNull: false
       }
     });
 
