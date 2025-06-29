@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<!-- File: C:\Users\vnagu\Desktop\servera\proget5\server-files\web\auth\enhanced_auth.html -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Authentication - Project V5</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Main container */
+        .auth-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 450px;
+            max-width: 500px;
+            z-index: 10;
+            position: relative;
+            transform: translateY(20px);
+            animation: slideUp 0.8s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-title {
+            color: white;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Server info */
+        .server-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .server-name {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .server-status {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #2ecc71;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Form styles */
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .form-input.error {
+            box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.6);
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Password strength indicator */
+        .password-strength {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-weak { background: #e74c3c; width: 33%; }
+        .strength-medium { background: #f39c12; width: 66%; }
+        .strength-strong { background: #2ecc71; width: 100%; }
+
+        /* Button styles */
+        .auth-button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-button:active {
+            transform: translateY(0);
+        }
+
+        .auth-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Switch link */
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-switch a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .auth-switch a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Error message */
+        .error-message {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            color: #ff6b6b;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Success message */
+        .success-message {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.5);
+            color: #2ecc71;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        /* Connection status */
+        .connection-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 12px;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .connection-good { border-left: 4px solid #2ecc71; }
+        .connection-fair { border-left: 4px solid #f39c12; }
+        .connection-poor { border-left: 4px solid #e74c3c; }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 20;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 14px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .auth-container {
+                margin: 20px;
+                min-width: auto;
+                width: calc(100% - 40px);
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Connection status -->
+    <div class="connection-status" id="connectionStatus">
+        <span id="connectionText">Connecting...</span>
+    </div>
+
+    <!-- Main authentication container -->
+    <div class="auth-container">
+        <!-- Loading overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">Please wait...</div>
+        </div>
+
+        <!-- Header -->
+        <div class="auth-header">
+            <h1 class="auth-title">Project V5</h1>
+            <p class="auth-subtitle">Enhanced Roleplay Experience</p>
+        </div>
+
+        <!-- Server info -->
+        <div class="server-info">
+            <div class="server-name">
+                <span class="status-dot"></span>
+                GTA V: Romania - Enhanced
+            </div>
+            <div class="server-status" id="serverStatus">
+                Server Online • Enhanced Authentication
+            </div>
+        </div>
+
+        <!-- Error/Success messages -->
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <!-- Login Form -->
+        <form class="auth-form" id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-input" id="loginUsername" placeholder="Enter your username" autocomplete="username" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="auth-button" id="loginButton">
+                <span class="button-text">Sign In</span>
+                <div class="button-loading" style="display: none;"></div>
+            </button>
+            <div class="auth-switch">
+                <a href="#" onclick="switchToRegister()">Don't have an account? Create one</a>
+            </div>
+        </form>
+
+        <!-- Register Form -->
+        <form class="auth-form" id="registerForm">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-input" id="regUsername" placeholder="Choose a username" autocomplete="username" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email (Optional)</label>
+                <input type="email" class="form-input" id="regEmail" placeholder="your.email@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="regPassword" placeholder="Create a strong password" autocomplete="new-password" required>
+                <div class="password-strength">
+                    <div class="strength-bar" id="strengthBar"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" class="form-input" id="regConfirmPassword" placeholder="Confirm your password" autocomplete="new-password" required>
+            </div>
+            <button type="submit" class="auth-button" id="registerButton">
+                <span class="button-text">Create Account</span>
+                <div class="button-loading" style="display: none;"></div>
+            </button>
+            <div class="auth-switch">
+                <a href="#" onclick="switchToLogin()">Already have an account? Sign in</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Global state
+        let authState = {
+            currentForm: 'login',
+            isLoading: false,
+            connectionQuality: 'good',
+            attempts: 0,
+            maxAttempts: 5
+        };
+
+        // Initialize authentication interface
+        function initializeAuth(type) {
+            console.log('Initializing auth interface:', type);
+            authState.currentForm = type;
+            
+            if (type === 'login') {
+                switchToLogin();
+            } else {
+                switchToRegister();
+            }
+            
+            createParticles();
+            setupEventListeners();
+            updateConnectionStatus('good', 50);
+        }
+
+        // Set authentication method
+        function setAuthMethod(method) {
+            authState.currentForm = method;
+            if (method === 'login') {
+                switchToLogin();
+            } else {
+                switchToRegister();
+            }
+        }
+
+        // Create animated particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    const size = Math.random() * 6 + 2;
+                    const left = Math.random() * 100;
+                    const duration = Math.random() * 10 + 15;
+                    
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = left + '%';
+                    particle.style.animationDuration = duration + 's';
+                    particle.style.animationDelay = Math.random() * 5 + 's';
+                    
+                    particlesContainer.appendChild(particle);
+                }, i * 200);
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            
+            // Password strength checker
+            document.getElementById('regPassword').addEventListener('input', checkPasswordStrength);
+            
+            // Real-time validation
+            document.getElementById('regConfirmPassword').addEventListener('input', validatePasswordMatch);
+            
+            // Enter key handling
+            document.addEventListener('keydown', handleEnterKey);
+            
+            // Escape key handling
+            document.addEventListener('keydown', handleEscapeKey);
+        }
+
+        // Switch to login form
+        function switchToLogin() {
+            document.getElementById('loginForm').classList.add('active');
+            document.getElementById('registerForm').classList.remove('active');
+            authState.currentForm = 'login';
+            clearMessages();
+            document.getElementById('loginUsername').focus();
+        }
+
+        // Switch to register form
+        function switchToRegister() {
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('registerForm').classList.add('active');
+            authState.currentForm = 'register';
+            clearMessages();
+            document.getElementById('regUsername').focus();
+        }
+
+        // Handle login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            if (authState.isLoading) return;
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!validateLoginInput(username, password)) return;
+            
+            setLoadingState(true, 'Signing in...');
+            
+            // Call MP function
+            if (typeof mp !== 'undefined') {
+                mp.trigger('sendLoginData', password);
+            } else {
+                // Development fallback
+                setTimeout(() => {
+                    setLoadingState(false);
+                    showError('Demo mode - login simulation');
+                }, 2000);
+            }
+        }
+
+        // Handle registration
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            if (authState.isLoading) return;
+            
+            const username = document.getElementById('regUsername').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            if (!validateRegisterInput(username, email, password, confirmPassword)) return;
+            
+            setLoadingState(true, 'Creating account...');
+            
+            // Call MP function
+            if (typeof mp !== 'undefined') {
+                mp.trigger('sendRegisterData', password, confirmPassword, email);
+            } else {
+                // Development fallback
+                setTimeout(() => {
+                    setLoadingState(false);
+                    showSuccess('Demo mode - registration simulation');
+                }, 2000);
+            }
+        }
+
+        // Validation functions
+        function validateLoginInput(username, password) {
+            if (!username) {
+                showError('Please enter your username');
+                document.getElementById('loginUsername').classList.add('error');
+                return false;
+            }
+            
+            if (!password) {
+                showError('Please enter your password');
+                document.getElementById('loginPassword').classList.add('error');
+                return false;
+            }
+            
+            // Check attempt limits
+            if (authState.attempts >= authState.maxAttempts) {
+                showError('Too many failed attempts. Please restart your game.');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function validateRegisterInput(username, email, password, confirmPassword) {
+            // Username validation
+            if (!username || username.length < 3) {
+                showError('Username must be at least 3 characters long');
+                document.getElementById('regUsername').classList.add('error');
+                return false;
+            }
+            
+            if (username.length > 20) {
+                showError('Username must be less than 20 characters');
+                document.getElementById('regUsername').classList.add('error');
+                return false;
+            }
+            
+            // Email validation (optional)
+            if (email && !isValidEmail(email)) {
+                showError('Please enter a valid email address');
+                document.getElementById('regEmail').classList.add('error');
+                return false;
+            }
+            
+            // Password validation
+            if (!password || password.length < 6) {
+                showError('Password must be at least 6 characters long');
+                document.getElementById('regPassword').classList.add('error');
+                return false;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                document.getElementById('regConfirmPassword').classList.add('error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Password strength checker
+        function checkPasswordStrength() {
+            const password = document.getElementById('regPassword').value;
+            const strengthBar = document.getElementById('strengthBar');
+            
+            let strength = 0;
+            
+            // Length check
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            
+            // Character variety
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            // Update visual indicator
+            strengthBar.className = 'strength-bar';
+            if (strength <= 2) {
+                strengthBar.classList.add('strength-weak');
+            } else if (strength <= 4) {
+                strengthBar.classList.add('strength-medium');
+            } else {
+                strengthBar.classList.add('strength-strong');
+            }
+        }
+
+        // Validate password match
+        function validatePasswordMatch() {
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const confirmField = document.getElementById('regConfirmPassword');
+            
+            if (confirmPassword && password !== confirmPassword) {
+                confirmField.classList.add('error');
+            } else {
+                confirmField.classList.remove('error');
+            }
+        }
+
+        // Utility functions
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function setLoadingState(loading, text = 'Please wait...') {
+            authState.isLoading = loading;
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            
+            if (loading) {
+                loadingText.textContent = text;
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            successDiv.style.display = 'none';
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Clear input errors after showing message
+            setTimeout(() => {
+                document.querySelectorAll('.form-input.error').forEach(input => {
+                    input.classList.remove('error');
+                });
+            }, 3000);
+            
+            authState.attempts++;
+        }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            errorDiv.style.display = 'none';
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        function clearMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            
+            // Clear input errors
+            document.querySelectorAll('.form-input.error').forEach(input => {
+                input.classList.remove('error');
+            });
+        }
+
+        function updateConnectionStatus(status, ping) {
+            const statusEl = document.getElementById('connectionStatus');
+            const textEl = document.getElementById('connectionText');
+            
+            statusEl.className = `connection-status connection-${status}`;
+            textEl.textContent = `${status.charAt(0).toUpperCase() + status.slice(1)} • ${ping}ms`;
+        }
+
+        function handleEnterKey(event) {
+            if (event.key === 'Enter' && !authState.isLoading) {
+                if (authState.currentForm === 'login') {
+                    handleLogin(event);
+                } else {
+                    handleRegister(event);
+                }
+            }
+        }
+
+        function handleEscapeKey(event) {
+            if (event.key === 'Escape') {
+                clearMessages();
+            }
+        }
+
+        // Functions called from client
+        function showAuthError(message) {
+            setLoadingState(false);
+            showError(message);
+        }
+
+        function showNotification(message, type, color) {
+            if (type === 'success') {
+                showSuccess(message);
+            } else {
+                showError(message);
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default to login
+            initializeAuth('login');
+        });
+
+        // Expose functions to MP
+        window.initializeAuth = initializeAuth;
+        window.setAuthMethod = setAuthMethod;
+        window.setLoadingState = setLoadingState;
+        window.showAuthError = showAuthError;
+        window.showNotification = showNotification;
+        window.updateConnectionStatus = updateConnectionStatus;
+        window.handleEnterKey = handleEnterKey;
+        window.handleEscapeKey = handleEscapeKey;
+    </script>
+</body>
+</html>

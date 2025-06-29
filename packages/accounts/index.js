@@ -28,46 +28,46 @@ mp.events.add('playerReady', (player) => {
 });
 
 mp.events.add('onLoginAttempt', async (player, data) => {
-  const { login, password } = JSON.parse(data);
+  try {
+    const { login, password } = JSON.parse(data);
 
-  const account  = await Account.findOne({ where: { login } });
-  if (!account) return player.call('showAuthError', ['Неправильний пароль']);
+    const account  = await Account.findOne({ where: { login } });
+    if (!account) return player.call('showAuthError', ['Неправильний пароль']);
 
-const isPasswordMatch = await bcrypt.compare(password, account.password);
+    const isPasswordMatch = await bcrypt.compare(password, account.password);
 
-if(!isPasswordMatch) {
-  return player.call('showAuthError', ['Неправильний пароль']);
-}
+    if(!isPasswordMatch) {
+      return player.call('showAuthError', ['Неправильний пароль']);
+    }
 
-// player = {
-//   name: '',
-//   level: '',
+    player.account = account;
 
-//   setName(name) {
-//     this.name = name; 
-//   }
-// }
-  player.account = account;
-
-
-  player.call('hideLoginDialog'); 
-  player.call('updateAuthClient'); 
-
+    player.call('hideLoginDialog'); 
+    player.call('updateAuthClient'); 
+  } catch (error) {
+    console.error('Error during login attempt:', error);
+    player.call('showAuthError', ['Виникла помилка під час входу']);
+  }
 });
 
 mp.events.add('onRegisterAttempt', async (player, data) => {
-  const { login, password } = JSON.parse(data);
+  try {
+    const { login, password } = JSON.parse(data);
 
-  const account = await Account.findOne({ where: { login } });
-  if (account){
-    return player.call('showAuthError', ['Аккаунт було створено раніше']);
+    const account = await Account.findOne({ where: { login } });
+    if (account){
+      return player.call('showAuthError', ['Аккаунт було створено раніше']);
+    }
+
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+    await Account.create({
+      login,
+      password: passwordHash,
+    });
+
+    player.call('hideLoginDialog'); 
+  } catch (error) {
+    console.error('Error during register attempt:', error);
+    player.call('showAuthError', ['Виникла помилка під час реєстрації']);
   }
-
-  const passwordHash = await bcrypt.hash(password, saltRounds);
-  await Account.create({
-    login,
-    password: passwordHash,
-  });
-
-  player.call('hideLoginDialog'); 
 });
