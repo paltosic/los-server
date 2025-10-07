@@ -253,25 +253,25 @@ module.exports = {
     });
 
     // Додати індекси для кращої продуктивності
-    await queryInterface.addIndex('enhanced_accounts', ['username'], {
+    await queryInterface.addIndex('accounts', ['username'], {
       name: 'idx_username',
       unique: true
     });
     
-    await queryInterface.addIndex('enhanced_accounts', ['ip'], {
+    await queryInterface.addIndex('accounts', ['ip'], {
       name: 'idx_ip'
     });
     
-    await queryInterface.addIndex('enhanced_accounts', ['admin'], {
+    await queryInterface.addIndex('accounts', ['admin'], {
       name: 'idx_admin'
     });
     
-    await queryInterface.addIndex('enhanced_accounts', ['lastConnected'], {
+    await queryInterface.addIndex('accounts', ['lastConnected'], {
       name: 'idx_last_connected'
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('enhanced_accounts');
+    await queryInterface.dropTable('accounts');
   }
 };
